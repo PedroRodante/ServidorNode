@@ -13,17 +13,18 @@ app.get("/", function(req,res){
     res.send("CHEGUEI!!");
 });
 
-app.post("/dado", function (req, res){
+app.post("/cadastro_usuario", function (req, res){
     res.header("Access-Control-Allow-Origin", "*");
     console.log(req.body);
     console.log("Recebi um dado");
     console.log(req.body.dado);
 
     let nome = (req.body.nome);
-    let idade = parseInt(req.body.idade);
-    let profissao = (req.body.profissao);
+    let senha = parseInt(req.body.senha);
+    let email = (req.body.email);
+    let telefone = parseInt(req.body.telefone);
 
-    let sql = `INSERT INTO Usuarios (nome, idade, profissao, habilitado) VALUES ("${nome}", ${idade}, "${profissao}", 1)`
+    let sql = `INSERT INTO Usuarios (nome, senha, email, telefone) VALUES ("${nome}", "${senha}", "${email}", "${telefone}")`
     console.log(sql);
     db.all(sql, [], (err, rows) =>
     {
@@ -51,5 +52,5 @@ app.get("/todos_usuarios", function(req,res){
 });
 
 app.listen(port, () => {
-    console.log(`Servidor Rodante com a porta ${port}`)
+    console.log(`Servidor Rodante na porta ${port}`)
 });
