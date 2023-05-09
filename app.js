@@ -20,7 +20,7 @@ app.post("/cadastro_usuario", function (req, res){
     console.log(req.body.dado);
 
     let nome = (req.body.nome);
-    let senha = parseInt(req.body.senha);
+    let senha = (req.body.senha);
     let email = (req.body.email);
     let telefone = parseInt(req.body.telefone);
 
