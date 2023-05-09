@@ -18,7 +18,21 @@ app.post("/dado", function (req, res){
     console.log(req.body);
     console.log("Recebi um dado");
     console.log(req.body.dado);
-    res.send("JSON RECEBIDO!");
+
+    let nome = (req.body.nome);
+    let idade = parseInt(req.body.idade);
+    let profissao = (req.body.profissao);
+
+    let sql = `INSERT INTO Usuarios (nome, idade, profissao, habilitado) VALUES ("${nome}", ${idade}, "${profissao}", 1)`
+    console.log(sql);
+    db.all(sql, [], (err, rows) =>
+    {
+        if(err)
+        {
+            res.send(err);
+        }
+        res.send("Usúario adicionado!")
+    });
 });
 
 app.get("/todos_usuarios", function(req,res){
