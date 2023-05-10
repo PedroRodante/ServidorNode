@@ -17,27 +17,38 @@ app.post("/cadastro_usuario", function (req, res){
     res.header("Access-Control-Allow-Origin", "*");
     console.log(req.body);
     console.log("Recebi um dado");
-    console.log(req.body.dado);
 
     let nome = (req.body.nome);
     let senha = (req.body.senha);
     let email = (req.body.email);
     let telefone = parseInt(req.body.telefone);
 
-    let sql = `INSERT INTO Usuarios (nome, senha, email, telefone) VALUES ("${nome}", "${senha}", "${email}", "${telefone}")`
-    console.log(sql);
+    let sql = `SELECT * FROM Usuarios WHERE email="${email}"`;
     db.all(sql, [], (err, rows) =>
     {
-        if(err)
-        {
+        if (err) {
             res.send(err);
+            console.log(err);
+        } else if (rows.length > 0) {
+            res.send("Email já existe");
+            console.log("Email já existe!");
+        } else {
+            sql = `INSERT INTO Usuarios (nome, senha, email, telefone) VALUES ("${nome}", "${senha}", "${email}", "${telefone}")`;
+            db.all(sql, [], (err, rows) => {
+                if (err) {
+                    res.send(err);
+                } else {
+                    res.send("Usuário adicionado");
+                    console.log("Usuário adicionado!");
+                }
+            });
         }
-        console.log("Usuário adicionado.");
-        res.send("Usuário adicionado!")
     });
 });
 
-app.get('/login', function (req, res) {
+
+
+app.get("/login", function (req, res) {
     res.header("Access-Control-Allow-Origin", "*");
     console.log(req.query);
     console.log("Realizando login");
@@ -73,10 +84,10 @@ app.get("/todos_usuarios", function(req,res){
     {
         if(err)
         {
-            console.log("aqui 2");
+            console.log("Deu errinho na att");
             res.send(err);
         }
-        console.log("linhas: " + rows);
+        console.log("Acesse-os em: /todos_usuarios");
         res.send(rows);
     });
 });
