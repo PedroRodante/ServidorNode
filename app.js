@@ -27,19 +27,20 @@ app.post("/cadastro_usuario", function (req, res){
     db.all(sql, [], (err, rows) =>
     {
         if (err) {
+            console.log("Erro" + err);
             res.send(err);
-            console.log(err);
         } else if (rows.length > 0) {
-            res.send("Email já existe");
             console.log("Email já existe!");
+            res.send("Email já existe");            
         } else {
             sql = `INSERT INTO Usuarios (nome, senha, email, telefone) VALUES ("${nome}", "${senha}", "${email}", "${telefone}")`;
             db.all(sql, [], (err, rows) => {
                 if (err) {
+                    console.log(err);
                     res.send(err);
                 } else {
-                    res.send("Usuário adicionado");
                     console.log("Usuário adicionado!");
+                    res.send("Usuário adicionado");                    
                 }
             });
         }
