@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const DBPATH = require ='db_SlowFu.db';
 var db = new sqlite3.Database(DBPATH);//Abre o banco
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 
@@ -51,7 +52,7 @@ app.post("/cadastro_usuario", function (req, res){
 
 app.get("/login", function (req, res) {
     res.header("Access-Control-Allow-Origin", "*");
-    console.log(req.query);
+    console.log(req.body);
     console.log("Realizando login");
     
     let email = req.query.email;
