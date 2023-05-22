@@ -96,13 +96,14 @@ app.post("/cadastro_post", function (req, res) {
 
   let nome = req.body.nome;
   let valor = parseFloat(req.body.valor);
+  let tipo = req.body.tipo;
   let descricao = req.body.descricao;
   let data = parseFloat(req.body.data);
   let local = req.body.local;
   let email = req.body.email;
   let telefone = parseInt(req.body.telefone);
 
-  sql = `INSERT INTO Posts (nome, senha, email, telefone) VALUES ("${nome}", "${valor}", "${descricao}", "${data}", "${local}", "${email}", "${telefone}")`;
+  sql = `INSERT INTO Posts (nome, senha, email, telefone) VALUES ("${nome}", "${valor}", "${tipo}", "${descricao}", "${data}", "${local}", "${email}", "${telefone}")`;
   db.all(sql, [], (err, rows) => {
     if (err) {
       console.log(err);
