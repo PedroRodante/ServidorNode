@@ -6,6 +6,13 @@ const sqlite3 = require("sqlite3").verbose();
 const DBPATH = (require = "db_SlowFu.db");
 var db = new sqlite3.Database(DBPATH); //Abre o banco
 
+//Variaveis locais:
+let email;
+let telefone;
+let nome;
+let senha;
+let local;
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -19,10 +26,10 @@ app.post("/cadastro_usuario", function (req, res) {
   console.log(req.body);
   console.log("Recebi um dado");
 
-  let nome = req.body.nome;
-  let senha = req.body.senha;
-  let email = req.body.email;
-  let telefone = parseInt(req.body.telefone);
+  nome = req.body.nome;
+  senha = req.body.senha;
+  email = req.body.email;
+  telefone = parseInt(req.body.telefone);
 
   let sql = `SELECT * FROM Usuarios WHERE email="${email}"`;
   db.all(sql, [], (err, rows) => {
@@ -52,8 +59,8 @@ app.get("/login", function (req, res) {
   console.log(req.body);
   console.log("Realizando login");
 
-  let email = req.query.email;
-  let senha = req.query.senha;
+  email = req.query.email;
+  senha = req.query.senha;
 
   let sql = `SELECT * FROM Usuarios WHERE email = "${email}"`;
   db.all(sql, [], (err, rows) => {
@@ -94,16 +101,14 @@ app.post("/cadastro_post", function (req, res) {
   console.log(req.body);
   console.log("Recebi um dado");
 
-  let nome = req.body.nome;
+  let titulo = req.body.titulo;
   let valor = parseFloat(req.body.valor);
   let tipo = req.body.tipo;
   let descricao = req.body.descricao;
   let data = parseFloat(req.body.data);
-  let local = req.body.local;
-  let email = req.body.email;
-  let telefone = parseInt(req.body.telefone);
+  local = req.body.local;
 
-  sql = `INSERT INTO Posts (nome, senha, email, telefone) VALUES ("${nome}", "${valor}", "${tipo}", "${descricao}", "${data}", "${local}", "${email}", "${telefone}")`;
+  sql = `INSERT INTO Posts (titulo, valor, tipo, descricao, data, local, email, telefone) VALUES ("${titulo}", "${valor}", "${tipo}", "${descricao}", "${data}", "${local}", "${email}", "${telefone}")`;
   db.all(sql, [], (err, rows) => {
     if (err) {
       console.log(err);
@@ -120,8 +125,6 @@ app.get("/posts_usuario", function (req, res) {
   console.log("Tentei pegar os posts de um usuário");
   console.log(req.body);
   console.log("Recebi um dado");
-
-  let email = req.body.email;
 
   db.all(`SELECT * FROM Posts WHERE email="${email}"`, [], (err, rows) => {
     if (err) {
