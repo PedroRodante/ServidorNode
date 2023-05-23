@@ -7,11 +7,11 @@ const DBPATH = (require = "db_SlowFu.db");
 var db = new sqlite3.Database(DBPATH); //Abre o banco
 
 //Variaveis locais:
-let email;
-let telefone;
-let nome;
-let senha;
-let local;
+let email = "teste";
+let telefone = 11900000000;
+let nome = "Sem Nome";
+let senha = "Sem Senha";
+let local = "Sem Local";
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -75,6 +75,8 @@ app.get("/login", function (req, res) {
       if (senha === rows[0].senha) {
         console.log("Senha correta.");
         res.send("Login realizado com sucesso!");
+        telefone = rows[0].telefone;
+        nome = rows[0].nome;
       } else {
         console.log("Senha incorreta.");
         res.send("Senha incorreta.");
@@ -102,10 +104,10 @@ app.post("/cadastro_post", function (req, res) {
   console.log("Recebi um dado");
 
   let titulo = req.body.titulo;
-  let valor = parseFloat(req.body.valor);
+  let valor = req.body.valor;
   let tipo = req.body.tipo;
   let descricao = req.body.descricao;
-  let data = parseFloat(req.body.data);
+  let data = req.body.data;
   local = req.body.local;
 
   sql = `INSERT INTO Posts (titulo, valor, tipo, descricao, data, local, email, telefone) VALUES ("${titulo}", "${valor}", "${tipo}", "${descricao}", "${data}", "${local}", "${email}", "${telefone}")`;
@@ -123,9 +125,6 @@ app.post("/cadastro_post", function (req, res) {
 app.get("/posts_usuario", function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
   console.log("Tentei pegar os posts de um usuário");
-  console.log(req.body);
-  console.log("Recebi um dado");
-
   db.all(`SELECT * FROM Posts WHERE email="${email}"`, [], (err, rows) => {
     if (err) {
       console.log("Deu errinho para puxar esses posts.");
@@ -137,17 +136,37 @@ app.get("/posts_usuario", function (req, res) {
 });
 
 app.get("/todos_posts", function (req, res) {
-    res.header("Access-Control-Allow-Origin", "*");
-    console.log("Atualizei os Posts");
-    db.all(`SELECT * FROM Posts`, [], (err, rows) => {
-      if (err) {
-        console.log("Deu errinho na att");
-        res.send(err);
-      }
-      console.log("Acesse-os em: /todos_posts");
-      res.send(rows);
-    });
+  res.header("Access-Control-Allow-Origin", "*");
+  console.log("Atualizei os Posts");
+  db.all(`SELECT * FROM Posts`, [], (err, rows) => {
+    if (err) {
+      console.log("Deu errinho na att");
+      res.send(err);
+    }
+    console.log("Acesse-os em: /todos_posts");
+    res.send(rows);
   });
+});
+
+app.post("/delete_post_usuario", function (req, res) {
+  res.header("Access-Control-Allow-Origin", "*");
+  console.log("Recebi alguma coisa");
+  console.log(req);
+  res.send("Você passou no servidor!");
+
+  let postID = parseInt(req.body.postID)
+
+  db.all(`DELETE FROM Posts WHERE postID = ${postID}`, [], (err, rows) => {
+    if (err) {
+      console.log("Deu errinho na att");
+      res.send(err);
+    }
+    else{
+    console.log(`O post a seguir foi deletado: "${rows}"`);
+    res.send(rows);
+    }
+  });
+});
 
 app.listen(port, () => {
   console.log(`Servidor Rodante na porta ${port}`);
