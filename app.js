@@ -151,8 +151,6 @@ app.get("/todos_posts", function (req, res) {
 app.post("/delete_post_usuario", function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
   console.log("Recebi alguma coisa");
-  console.log(req);
-  res.send("Você passou no servidor!");
 
   let postID = parseInt(req.body.postID)
 
