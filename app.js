@@ -102,15 +102,14 @@ app.post("/cadastro_post", function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
   console.log(req.body);
   console.log("Recebi um dado");
-
-  let titulo = req.body.titulo;
+  
   let valor = req.body.valor;
   let tipo = req.body.tipo;
   let descricao = req.body.descricao;
   let data = req.body.data;
   local = req.body.local;
 
-  sql = `INSERT INTO Posts (titulo, valor, tipo, descricao, data, local, email, telefone) VALUES ("${titulo}", "${valor}", "${tipo}", "${descricao}", "${data}", "${local}", "${email}", "${telefone}")`;
+  sql = `INSERT INTO Posts (valor, tipo, descricao, data, local, email, telefone, nome) VALUES ("${valor}", "${tipo}", "${descricao}", "${data}", "${local}", "${email}", "${telefone}", "${nome}")`;
   db.all(sql, [], (err, rows) => {
     if (err) {
       console.log(err);
