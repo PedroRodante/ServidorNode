@@ -7,7 +7,7 @@ const DBPATH = (require = "db_SlowFu.db");
 var db = new sqlite3.Database(DBPATH); //Abre o banco
 
 //Variaveis locais:
-let email = "teste";
+let email = "Sem Email";
 let telefone = 11900000000;
 let nome = "Sem Nome";
 let senha = "Sem Senha";
@@ -54,6 +54,43 @@ app.post("/cadastro_usuario", function (req, res) {
   });
 });
 
+app.post("/alterar_dados_usuario", function (req, res) {
+  res.header("Access-Control-Allow-Origin", "*");
+  console.log("Recebi um dado");
+  console.log(req.body);
+
+  let emailNovo = req.body.email;
+  let nomeNovo = req.body.nome;
+  let senhaNova = req.body.senha;
+  let telefoneNovo = parseInt(req.body.telefone);
+
+  let sql = `SELECT * FROM Usuarios WHERE email="${email}"`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.log("Erro: " + err);
+      res.send(err);
+    } else if (rows.length === 0) {
+      console.log("Usuário não encontrado!");
+      res.send("Usuário não encontrado");
+    } else {
+      console.log(rows);
+      let usuarioId = rows[0].ID; // Assume que o ID do usuário está na coluna "id"
+      console.log("Usuario acionado com id: " + usuarioId);
+      sql = `UPDATE Usuarios SET nome="${nomeNovo}", senha="${senhaNova}", email="${emailNovo}", telefone="${telefoneNovo}" WHERE id="${usuarioId}"`;
+      db.all(sql, [], (err, rows) => {
+        if (err) {
+          console.log(err);
+          res.send(err);
+        } else {
+          console.log("Usuário atualizado!");
+          res.send("Usuário atualizado");
+        }
+      });
+    }
+  });
+});
+
+
 app.get("/login", function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
   console.log(req.body);
@@ -94,6 +131,19 @@ app.get("/todos_usuarios", function (req, res) {
       res.send(err);
     }
     console.log("Acesse-os em: /todos_usuarios");
+    res.send(rows);
+  });
+});
+
+app.get("/dados_usuario", function (req, res) {
+  res.header("Access-Control-Allow-Origin", "*");
+  console.log("Atualizei os Usuários");
+  db.all(`SELECT * FROM Usuarios WHERE email="${email}"`, [], (err, rows) => {
+    if (err) {
+      console.log("Deu errinho na att");
+      res.send(err);
+    }
+    console.log("Acesse-os em: /dados_usuario");
     res.send(rows);
   });
 });
@@ -147,6 +197,37 @@ app.get("/todos_posts", function (req, res) {
   });
 });
 
+app.post("/delete_usuario", function (req, res) {
+  res.header("Access-Control-Allow-Origin", "*");
+  console.log("Recebi um dado");
+  console.log(req.body);
+
+  let sql = `SELECT * FROM Usuarios WHERE email="${email}"`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.log("Erro: " + err);
+      res.send(err);
+    } else if (rows.length === 0) {
+      console.log("Usuário não encontrado!");
+      res.send("Usuário não encontrado");
+    } else {
+      console.log(rows);
+      let usuarioId = rows[0].ID; // Assume que o ID do usuário está na coluna "id"
+      console.log("Usuario acionado com id: " + usuarioId);
+      sql = `DELETE FROM Usuarios WHERE id="${usuarioId}"`;
+      db.all(sql, [], (err, rows) => {
+        if (err) {
+          console.log(err);
+          res.send(err);
+        } else {
+          console.log("Usuário atualizado!");
+          res.send("Usuário atualizado");
+        }
+      });
+    }
+  });
+});
+
 app.post("/delete_post_usuario", function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
   console.log("Recebi alguma coisa");
@@ -163,6 +244,24 @@ app.post("/delete_post_usuario", function (req, res) {
     res.send(rows);
     }
   });
+});
+
+app.get("/sair", function (req, res) {
+  res.header("Access-Control-Allow-Origin", "*");
+  console.log("Fui acionado");
+
+  console.log("Saindo!");
+  email = "Sem Email";
+  telefone = 11900000000;
+  nome = "Sem Nome";
+  senha = "Sem Senha";
+  local = "Sem Local";
+
+  const response = {
+    message: "Variáveis deletadas com sucesso!"
+  };
+  res.json(response);
+  console.log("Deu tudo certo!");
 });
 
 app.listen(port, () => {
