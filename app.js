@@ -6,13 +6,6 @@ const sqlite3 = require("sqlite3").verbose();
 const DBPATH = (require = "db_SlowFu.db");
 var db = new sqlite3.Database(DBPATH); //Abre o banco
 
-//Variaveis locais:
-let email = "Sem Email";
-let telefone = 11900000000;
-let nome = "Sem Nome";
-let senha = "Sem Senha";
-let local = "Sem Local";
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -26,10 +19,10 @@ app.post("/cadastro_usuario", function (req, res) {
   console.log(req.body);
   console.log("Recebi um dado");
 
-  nome = req.body.nome;
-  senha = req.body.senha;
-  email = req.body.email;
-  telefone = parseInt(req.body.telefone);
+  let nome = req.body.nome;
+  let senha = req.body.senha;
+  let email = req.body.email;
+  let telefone = parseInt(req.body.telefone);
 
   let sql = `SELECT * FROM Usuarios WHERE email="${email}"`;
   db.all(sql, [], (err, rows) => {
@@ -63,41 +56,31 @@ app.post("/alterar_dados_usuario", function (req, res) {
   let nomeNovo = req.body.nome;
   let senhaNova = req.body.senha;
   let telefoneNovo = parseInt(req.body.telefone);
+  let usuarioId = req.body.id;
 
-  let sql = `SELECT * FROM Usuarios WHERE email="${email}"`;
+  console.log("Usuario acionado com id: " + usuarioId);
+  sql = `UPDATE Usuarios SET nome="${nomeNovo}", senha="${senhaNova}", email="${emailNovo}", telefone="${telefoneNovo}" WHERE id="${usuarioId}"`;
   db.all(sql, [], (err, rows) => {
     if (err) {
-      console.log("Erro: " + err);
+      console.log(err);
       res.send(err);
-    } else if (rows.length === 0) {
-      console.log("Usuário não encontrado!");
-      res.send("Usuário não encontrado");
     } else {
-      console.log(rows);
-      let usuarioId = rows[0].ID; // Assume que o ID do usuário está na coluna "id"
-      console.log("Usuario acionado com id: " + usuarioId);
-      sql = `UPDATE Usuarios SET nome="${nomeNovo}", senha="${senhaNova}", email="${emailNovo}", telefone="${telefoneNovo}" WHERE id="${usuarioId}"`;
+      console.log("Usuário atualizado!");
+      sql = `SELECT * FROM Usuarios WHERE email="${emailNovo}"`;
       db.all(sql, [], (err, rows) => {
-        if (err) {
-          console.log(err);
-          res.send(err);
-        } else {
-          console.log("Usuário atualizado!");
-          res.send("Usuário atualizado");
-        }
+        res.send(rows);
       });
     }
   });
 });
-
 
 app.get("/login", function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
   console.log(req.body);
   console.log("Realizando login");
 
-  email = req.query.email;
-  senha = req.query.senha;
+  let email = req.query.email;
+  let senha = req.query.senha;
 
   let sql = `SELECT * FROM Usuarios WHERE email = "${email}"`;
   db.all(sql, [], (err, rows) => {
@@ -111,7 +94,7 @@ app.get("/login", function (req, res) {
       console.log("Usuário encontrado.");
       if (senha === rows[0].senha) {
         console.log("Senha correta.");
-        res.send("Login realizado com sucesso!");
+        res.send("Login");
         telefone = rows[0].telefone;
         nome = rows[0].nome;
       } else {
@@ -135,29 +118,38 @@ app.get("/todos_usuarios", function (req, res) {
   });
 });
 
-app.get("/dados_usuario", function (req, res) {
+app.post("/dados_usuario", function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
   console.log("Atualizei os Usuários");
-  db.all(`SELECT * FROM Usuarios WHERE email="${email}"`, [], (err, rows) => {
-    if (err) {
-      console.log("Deu errinho na att");
-      res.send(err);
+  console.log(req.body);
+  let emailCheck = req.body.email;
+  console.log(emailCheck);
+
+  db.all(
+    `SELECT * FROM Usuarios WHERE email="${emailCheck}"`,
+    [],
+    (err, rows) => {
+      if (err) {
+        console.log("Deu errinho na att");
+        res.send(err);
+      }
+      console.log("Acesse-os em: /dados_usuario");
+      console.log(rows);
+      res.send(rows);
     }
-    console.log("Acesse-os em: /dados_usuario");
-    res.send(rows);
-  });
+  );
 });
 
 app.post("/cadastro_post", function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
   console.log(req.body);
   console.log("Recebi um dado");
-  
+
   let valor = req.body.valor;
   let tipo = req.body.tipo;
   let descricao = req.body.descricao;
   let data = req.body.data;
-  local = req.body.local;
+  let local = req.body.local;
 
   sql = `INSERT INTO Posts (valor, tipo, descricao, data, local, email, telefone, nome) VALUES ("${valor}", "${tipo}", "${descricao}", "${data}", "${local}", "${email}", "${telefone}", "${nome}")`;
   db.all(sql, [], (err, rows) => {
@@ -171,10 +163,15 @@ app.post("/cadastro_post", function (req, res) {
   });
 });
 
-app.get("/posts_usuario", function (req, res) {
+app.post("/posts_usuario", function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
+  console.log("Recebi um dado:");
+  console.log(req.body);
   console.log("Tentei pegar os posts de um usuário");
-  db.all(`SELECT * FROM Posts WHERE email="${email}"`, [], (err, rows) => {
+
+  let emailCheck = req.body.email;
+
+  db.all(`SELECT * FROM Posts WHERE email="${emailCheck}"`, [], (err, rows) => {
     if (err) {
       console.log("Deu errinho para puxar esses posts.");
       res.send(err);
@@ -201,29 +198,15 @@ app.post("/delete_usuario", function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
   console.log("Recebi um dado");
   console.log(req.body);
-
-  let sql = `SELECT * FROM Usuarios WHERE email="${email}"`;
+  let usuarioId = req.body.id; // Assume que o ID do usuário está na coluna "id"
+  sql = `DELETE FROM Usuarios WHERE id="${usuarioId}"`;
   db.all(sql, [], (err, rows) => {
     if (err) {
-      console.log("Erro: " + err);
+      console.log(err);
       res.send(err);
-    } else if (rows.length === 0) {
-      console.log("Usuário não encontrado!");
-      res.send("Usuário não encontrado");
     } else {
-      console.log(rows);
-      let usuarioId = rows[0].ID; // Assume que o ID do usuário está na coluna "id"
-      console.log("Usuario acionado com id: " + usuarioId);
-      sql = `DELETE FROM Usuarios WHERE id="${usuarioId}"`;
-      db.all(sql, [], (err, rows) => {
-        if (err) {
-          console.log(err);
-          res.send(err);
-        } else {
-          console.log("Usuário atualizado!");
-          res.send("Usuário atualizado");
-        }
-      });
+      console.log("Usuário deletado PARA SEMPRE");
+      res.send("Usuário deletado PARA SEMPRE!");
     }
   });
 });
@@ -232,16 +215,15 @@ app.post("/delete_post_usuario", function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
   console.log("Recebi alguma coisa");
 
-  let postID = parseInt(req.body.postID)
+  let postID = parseInt(req.body.postID);
 
   db.all(`DELETE FROM Posts WHERE postID = ${postID}`, [], (err, rows) => {
     if (err) {
       console.log("Deu errinho na att");
       res.send(err);
-    }
-    else{
-    console.log(`O post a seguir foi deletado: "${rows}"`);
-    res.send(rows);
+    } else {
+      console.log(`O post a seguir foi deletado: "${rows}"`);
+      res.send(rows);
     }
   });
 });
@@ -249,16 +231,9 @@ app.post("/delete_post_usuario", function (req, res) {
 app.get("/sair", function (req, res) {
   res.header("Access-Control-Allow-Origin", "*");
   console.log("Fui acionado");
-
   console.log("Saindo!");
-  email = "Sem Email";
-  telefone = 11900000000;
-  nome = "Sem Nome";
-  senha = "Sem Senha";
-  local = "Sem Local";
-
   const response = {
-    message: "Variáveis deletadas com sucesso!"
+    message: "Variáveis deletadas com sucesso!",
   };
   res.json(response);
   console.log("Deu tudo certo!");
